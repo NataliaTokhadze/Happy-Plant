@@ -1,8 +1,8 @@
-from rest_framework.viewsets import GenericViewSet
+from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.permissions import IsAuthenticated
-from .models import Plant
-from .serializers import PlantSerializer
+from .models import Plant, PlantType
+from .serializers import PlantSerializer, PlantTypeSerializer
 
 class PlantViewSet(ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     queryset = Plant.objects.all()
@@ -15,3 +15,6 @@ class PlantViewSet(ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateM
     def get_queryset(self):
         return Plant.objects.filter(user=self.request.user)
 
+class PlantTypeViewSet(ReadOnlyModelViewSet):
+    queryset = PlantType.objects.all()
+    serializer_class = PlantTypeSerializer

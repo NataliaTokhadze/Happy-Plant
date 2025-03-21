@@ -4,10 +4,11 @@ from django import forms
 from django.utils import timezone
 
 class PlantType(models.Model):
+    common_name = models.CharField(max_length=100)
     scientific_name = models.CharField(max_length=100)
-    family = models.CharField(max_length=100)
+    family = models.CharField(max_length=100, null=True)
     description = models.TextField(blank=True)
-    image_url = models.URLField(blank=True)
+    image_url = models.URLField(blank=True, null=True)
 
     def __str__(self):
         return self.scientific_name

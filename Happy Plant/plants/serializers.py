@@ -4,7 +4,7 @@ from .models import Plant, PlantType
 class PlantTypeSerializer(serializers.ModelSerializer): # მცენარეების ტიპებისთვის
     class Meta:
         model = PlantType
-        fields = ['id', 'name', 'scientific_name', 'family', 'description', 'image_url']
+        fields = ['id', 'scientific_name', 'family', 'description', 'image_url']
 
 class PlantSerializer(serializers.ModelSerializer): # მომხმარებლის მცენარეებისთვის
     plant_type = PlantTypeSerializer(read_only=True)
