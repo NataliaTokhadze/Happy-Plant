@@ -3,6 +3,7 @@ from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateMode
 from rest_framework.permissions import IsAuthenticated
 from .models import Plant, PlantType
 from .serializers import PlantSerializer, PlantTypeSerializer
+from .pagination import PlantPagination
 
 class PlantViewSet(ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     queryset = Plant.objects.all()
@@ -18,3 +19,4 @@ class PlantViewSet(ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateM
 class PlantTypeViewSet(ReadOnlyModelViewSet):
     queryset = PlantType.objects.all()
     serializer_class = PlantTypeSerializer
+    pagination_class = PlantPagination
