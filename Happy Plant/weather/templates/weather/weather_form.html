@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Weather Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Weather Information</h1>
+    
+    <div class="form-group">
+        <label for="city">City (required):</label>
+        <input type="text" id="city" name="city" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="country">Country (optional):</label>
+        <input type="text" id="country" name="country">
+    </div>
+    
+    <button onclick="getWeather()">Get Weather</button>
+    
+    <div id="result"></div>
+    
+    <script>
+        function getWeather() {
+            const city = document.getElementById('city').value;
+            const country = document.getElementById('country').value;
+            
+            if (!city) {
+                alert('City is required');
+                return;
+            }
+            
+            let url = `/weather/api/?city=${encodeURIComponent(city)}`;
+            if (country) {
+                url += `&country=${encodeURIComponent(country)}`;
+            }
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const resultDiv = document.getElementById('result');
+                    
+                    if (data.error) {
+                        resultDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+                    } else {
+                        let html = `
+                            <h2>Weather for ${data.city}, ${data.country}</h2>
+                            <p>Current temperature: ${data.current.temperature}°F</p>
+                            <p>Condition: ${data.current.condition}</p>
+                            <h3>Forecast:</h3>
+                            <ul>
+                        `;
+                        
+                        data.forecasts.slice(0, 5).forEach(forecast => {
+                            html += `<li>${forecast.day}: ${forecast.condition}, High: ${forecast.high}°F, Low: ${forecast.low}°F</li>`;
+                        });
+                        
+                        html += '</ul>';
+                        resultDiv.innerHTML = html;
+                    }
+                    
+                    resultDiv.style.display = 'block';
+                })
+                .catch(error => {
+                    document.getElementById('result').innerHTML = `<p>Error: ${error.message}</p>`;
+                    document.getElementById('result').style.display = 'block';
+                });
+        }
+    </script>
+</body>
+</html>
