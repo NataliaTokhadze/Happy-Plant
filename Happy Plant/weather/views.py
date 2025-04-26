@@ -7,23 +7,11 @@ import requests
 from .serializers import WeatherSerializer, ForecastSerializer, CurrentWeatherSerializer
 
 class WeatherViewSet(GenericViewSet):
-    """
-    ViewSet for weather information.
-    """
-    
     def list(self, request):
-        """
-        Render the weather form template.
-        GET /weather/
-        """
         return render(request, 'weather/weather_form.html')
     
     @action(detail=False, methods=['get'])
     def api(self, request):
-        """
-        Get weather data for a specified city and country.
-        GET /weather/api/?city=<city>&country=<country>
-        """
         city = request.query_params.get('city')
         country = request.query_params.get('country')
         
@@ -38,19 +26,8 @@ class WeatherViewSet(GenericViewSet):
         return Response(weather_data)
     
     def get_weather_data(self, city, country=None):
-        """
-        Get weather information for a specified city and optionally country
-        
-        Args:
-            city (str): The name of the city
-            country (str, optional): The name of the country
-        
-        Returns:
-            dict: Weather information or error message
-        """
         url = "https://yahoo-weather5.p.rapidapi.com/weather"
         
-        # If both city and country are provided, format the location as "city, country"
         if country:
             location = f"{city}, {country}"
         else:
@@ -59,7 +36,7 @@ class WeatherViewSet(GenericViewSet):
         querystring = {
             "location": location,
             "format": "json",
-            "u": "c"  # Fahrenheit, change to "c" for Celsius
+            "u": "c"
         }
         
         headers = {
@@ -69,11 +46,10 @@ class WeatherViewSet(GenericViewSet):
         
         try:
             response = requests.get(url, headers=headers, params=querystring)
-            response.raise_for_status()  # Raise an exception for HTTP errors
+            response.raise_for_status()
             
             data = response.json()
             
-            # Extract relevant information from the response
             weather_info = {
                 "city": data.get("location", {}).get("city", "Unknown"),
                 "country": data.get("location", {}).get("country", "Unknown"),
@@ -88,7 +64,6 @@ class WeatherViewSet(GenericViewSet):
                 "forecasts": []
             }
             
-            # Extract forecast information
             forecasts = data.get("forecasts", [])
             for forecast in forecasts:
                 weather_info["forecasts"].append({

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Happy Plant - Notifications</title>
+</head>
+<body>
+    <h1>Welcome to Happy Plant</h1>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVo883eIlgaKa7BTNuPizqgfoMfCK1gAc",
+            authDomain: "happy-plant-1128f.firebaseapp.com",
+            projectId: "happy-plant-1128f",
+            storageBucket: "happy-plant-1128f.firebasestorage.app",
+            messagingSenderId: "901298755649",
+            appId: "1:901298755649:web:c989189062ee5c93cecec0",
+            measurementId: "G-0QJ4CS79QD"
+        };
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const messaging = firebase.messaging();
+
+        messaging.getToken({ vapidKey: "BIxf3ipcsbrRkSGzEgAd0ah4ZR7-6ASOC0V1X8IpKaao0nwvKpn50vzBC-4_V3Rp4Hx0X5XpxH5RImaF419s8rA" }).then((currentToken) => {
+            if (currentToken) {
+                console.log('Device Token:', currentToken);
+            } else {
+                console.log('No registration token available.');
+            }
+        }).catch((err) => {
+            console.log('An error occurred while retrieving token. ', err);
+        });
+
+        messaging.onMessage((payload) => {
+            console.log('Message received. ', payload);
+            alert("New notification: " + payload.notification.title + " - " + payload.notification.body);
+        });
+    </script>
+</body>
+</html>
