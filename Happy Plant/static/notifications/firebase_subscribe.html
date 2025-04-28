@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Firebase Notification Test</title>
+    <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-messaging-compat.js"></script>
+</head>
+<body>
+    <h1>Push Notifications Test</h1>
+    <button id="subscribe">Subscribe to Notifications</button>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVo883eIlgaKa7BTNuPizqgfoMfCK1gAc",
+            authDomain: "happy-plant-1128f.firebaseapp.com",
+            projectId: "happy-plant-1128f",
+            storageBucket: "happy-plant-1128f.firebasestorage.app",
+            messagingSenderId: "901298755649",
+            appId: "1:901298755649:web:c989189062ee5c93cecec0",
+            measurementId: "G-0QJ4CS79QD"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Initialize Firebase Cloud Messaging
+        const messaging = firebase.messaging();
+
+        // Request permission and get token
+        document.getElementById('subscribe').addEventListener('click', async () => {
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    const token = await messaging.getToken({
+                        vapidKey: "YOUR_PUBLIC_VAPID_KEY" // This is from Firebase settings
+                    });
+                    console.log('User token:', token);
+                    // You can send this token to your Django backend to store it
+                } else {
+                    console.log('Permission denied.');
+                }
+            } catch (error) {
+                console.error('Error during subscription:', error);
+            }
+        });
+
+        // Handle incoming messages while app is open
+        messaging.onMessage((payload) => {
+            console.log('Message received:', payload);
+            new Notification(payload.notification.title, {
+                body: payload.notification.body,
+                icon: payload.notification.icon
+            });
+        });
+    </script>
+</body>
+</html>

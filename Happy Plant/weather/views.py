@@ -4,12 +4,15 @@ from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 from django.shortcuts import render
 import requests
+
 from .serializers import WeatherSerializer, ForecastSerializer, CurrentWeatherSerializer
+from notifications.firebase_service import send_push_to_multiple_devices
+from notifications.models import DeviceToken  # to get tokens from database
 
 class WeatherViewSet(GenericViewSet):
     def list(self, request):
         return render(request, 'weather/weather_form.html')
-    
+
     @action(detail=False, methods=['get'])
     def api(self, request):
         city = request.query_params.get('city')
@@ -22,9 +25,31 @@ class WeatherViewSet(GenericViewSet):
         
         if 'error' in weather_data:
             return Response(weather_data, status=status.HTTP_400_BAD_REQUEST)
+
+        # check weather conditions
+        bad_weather = self.is_bad_weather(weather_data)
+
+        # get all device tokens
+        tokens = DeviceToken.objects.values_list('token', flat=True)
+
+        if tokens:
+            if bad_weather:
+                # Send bad weather alert
+                send_push_to_multiple_devices(
+                    tokens=list(tokens),
+                    title="🌧️ Bad Weather Alert!",
+                    body=f"Today in {weather_data['city']}: {weather_data['current']['condition']}. Please be careful!"
+                )
+            else:
+                # Send daily reminder
+                send_push_to_multiple_devices(
+                    tokens=list(tokens),
+                    title="🌱 Daily Plant Care",
+                    body="Don't forget to water your plants today!"
+                )
         
         return Response(weather_data)
-    
+
     def get_weather_data(self, city, country=None):
         url = "https://yahoo-weather5.p.rapidapi.com/weather"
         
@@ -81,3 +106,15 @@ class WeatherViewSet(GenericViewSet):
             return {"error": f"API request failed: {str(e)}"}
         except (KeyError, ValueError) as e:
             return {"error": f"Error processing data: {str(e)}"}
+
+    def is_bad_weather(self, weather_data):
+        """
+        Simple method to decide if weather is bad enough to send a notification.
+        """
+        condition = weather_data.get('current', {}).get('condition', '').lower()
+        bad_conditions = ['rain', 'storm', 'snow', 'hail', 'thunder']
+
+        for bad in bad_conditions:
+            if bad in condition:
+                return True
+        return False
