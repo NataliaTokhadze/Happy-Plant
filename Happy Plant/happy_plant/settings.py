@@ -124,10 +124,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -139,3 +135,7 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
     'django.contrib.auth.hashers.Argon2PasswordHasher'
 ]
+
+TWILIO_ACCOUNT_SID = 'ACfcd5c8fed6312066617e3845228b66f9'
+TWILIO_AUTH_TOKEN = '9fcce4fa0237c57cc78b85921d099522'
+TWILIO_PHONE_NUMBER = '+19515841889'
